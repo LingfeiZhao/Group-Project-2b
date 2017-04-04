@@ -1,5 +1,6 @@
 import random
 import pylab
+import matplotlib.animation as animation
 
 class Predator_Prey(object):
 
@@ -114,20 +115,28 @@ class Predator_Prey(object):
 		self.n_fish.append(sum(i.count(1) for i in self.grid))
 
 
-
-
-
 PP=Predator_Prey(n0_shark=20, n0_fish=300, breed_age_shark=20, breed_age_fish=10, starve_time_shark=10,gridlen=40)
-#img=pylab.imshow(PP.grid,cmap='RdBu',clim=(-1,1),animated=True)
+
+fig=pylab.figure()
+images=[]
 for i in range(1000):
 	PP.update()
+	image=pylab.imshow(PP.grid,cmap='coolwarm',clim=(-1,1),animated=True,interpolation='none')
+	images.append([image])
 
-pylab.show()
+#plot animation 
+ani = animation.ArtistAnimation(fig, images, interval=100)
+pylab.title('Red fish and blue shark!')
+ani.save('shark eat fish.mp4')
+pylab.close()
+
+# plot population vs time
 pylab.plot(PP.t,PP.n_shark,'ro',label='shark')
 pylab.plot(PP.t,PP.n_fish,'co',label='fish')
 pylab.legend(loc=0,numpoints=1)
 pylab.xlabel('time')
 pylab.ylabel('number')
+pylab.savefig('population.pdf')
 pylab.show()
 
 
