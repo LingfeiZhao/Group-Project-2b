@@ -131,7 +131,7 @@ ani.save('shark eat fish.mp4')
 pylab.close()
 
 # plot population vs time
-pylab.plot(PP.t,PP.n_shark,'ro',label='shark')
+pylab.plot(PP.t,PP.n_shark,'ko',label='shark')
 pylab.plot(PP.t,PP.n_fish,'co',label='fish')
 pylab.legend(loc=0,numpoints=1)
 pylab.xlabel('time')
