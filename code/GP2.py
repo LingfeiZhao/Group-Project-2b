@@ -130,19 +130,26 @@ class Predator_Prey(object):
         self.n_fish.append(sum(i.count(1) for i in self.grid))
 
 class Lotka_Volterra(object):
-    def __init__(self, x0, y0, alpha, beta, gamma, delta, t_end=1000, dt=0.1):
+
+    def __init__(self, x0, y0, xmin, xmax, ymin, ymax, c, t_end=1000, dt=0.1):
         self.x0=x0
         self.y0=y0
-        self.alpha=alpha
-        self.beta=beta
-        self.gamma=gamma
-        self.delta=delta
+        self.alpha=c*self.g(self.h(xmax/float(xmin)))
+        self.beta=c*self.g(self.h(xmax/float(xmin)))*self.h(ymax/float(ymin))/float(ymin)
+        self.gamma=c*self.g(self.h(ymax/float(ymin)))
+        self.delta=c*self.g(self.h(ymax/float(ymin)))*self.h(xmax/float(xmin))/float(xmin)
         self.t_end=t_end
         self.dt=dt
 
         self.x=[self.x0]
         self.y=[self.y0]
         self.t=[0]
+
+    def h(self, x):
+        return pylab.log(x)/(x-1)
+    def g(self, x):
+        return x-1-pylab.log(x)
+
     def Dx(self, x, y, t):
         return x*(self.alpha-self.beta*y)
     def Dy(self, x, y, t):
@@ -162,48 +169,44 @@ class Lotka_Volterra(object):
         xn=x+(l1+2*l2+2*l3+l4)/6.0*self.dt
         tn=t+self.dt
         return xn,yn,tn
+
     def solve(self):
         while self.t[-1]<self.t_end:
             xn,yn,tn=self.runge_kutta(self.x[-1],self.y[-1],self.t[-1])
             self.x.append(xn)
             self.y.append(yn)
             self.t.append(tn)
-"""
+
+# solve the Lotka Volterra model
+LV=Lotka_Volterra(x0=300, y0=20, xmin=100, xmax=1500, ymin=20, ymax=200, c=0.06)
+LV.solve()
+
+# simulate the shark and fish
 PP=Predator_Prey(n0_shark=20, n0_fish=300, breed_age_shark=20, breed_age_fish=10, starve_time_shark=10,gridlen=40)
-
-fig=pylab.figure()
-images=[]
-for i in range(1500):
+Grids=[]
+for i in range(1000):
     PP.update()
-    image=pylab.imshow(PP.grid,cmap='coolwarm',clim=(-1,1),animated=True,interpolation='none')
-    images.append([image])
-
-#plot animation 
-ani = animation.ArtistAnimation(fig, images, interval=100)
-pylab.title('Red fish and blue shark!')
-ani.save('shark eat fish.mp4')
-pylab.close()
-
+    Grids.append(PP.grid)
+    
 # plot population vs time
-pylab.plot(PP.t,PP.n_shark,'ko',label='shark')
+pylab.plot(LV.t,LV.x,'c-',label='fish', linewidth=2)
+pylab.plot(LV.t,LV.y,'r-',label='shark', linewidth=2)
 pylab.plot(PP.t,PP.n_fish,'co',label='fish')
+pylab.plot(PP.t,PP.n_shark,'ro',label='shark')
 pylab.legend(loc=0,numpoints=1)
 pylab.xlabel('time')
 pylab.ylabel('number')
 pylab.savefig('population.pdf')
 pylab.show()
 
-"""
-LV=Lotka_Volterra(x0=300, y0=20, alpha=1.0/10, beta=0.001, gamma=1.0/10, delta=0.1/20)
-LV.solve()
-
-pylab.plot(LV.t,LV.x,'c-',label='fish')
-pylab.plot(LV.t,LV.y,'k-',label='shark')
-pylab.legend(loc=0,numpoints=1)
-pylab.xlabel('time')
-pylab.ylabel('number')
-pylab.xlim([0,1000])
-pylab.ylim([0,1600])
-#pylab.savefig('population.pdf')
-pylab.show()
+#plot animation 
+fig=pylab.figure()
+images=[]
+for i in range(1000):
+    image=pylab.imshow(Grids[i],cmap='coolwarm',clim=(-1,1),animated=True,interpolation='none')
+    images.append([image])
+ani = animation.ArtistAnimation(fig, images, interval=100)
+pylab.title('Red fish and blue shark!')
+ani.save('shark eat fish.mp4')
+pylab.close()
 
