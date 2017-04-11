@@ -176,22 +176,25 @@ class Lotka_Volterra(object):
             self.y.append(yn)
             self.t.append(tn)
 
-# solve the Lotka Volterra model
-LV=Lotka_Volterra(x0=4000, y0=200, t0=0, xmin=1000, xmax=8000, ymin=200, ymax=1000, c=0.1)
-LV.solve()
+
 
 # simulate the shark and fish
 PP=Predator_Prey(n0_shark=200, n0_fish=4000, breed_age_shark=20, breed_age_fish=10, starve_time_shark=10, gridlen=100)
 Grids=[]
-for i in range(1000):
+for i in range(2000):
     PP.update()
     Grids.append(copy.deepcopy(PP.grid))
-    
+ 
+# solve the Lotka Volterra model
+LV=Lotka_Volterra(x0=4000, y0=200, t0=500, xmin=1000, xmax=8000, ymin=200, ymax=1000, c=0.1115, t_end=2000)
+LV.solve()
+
 # plot population vs time
 pylab.plot(LV.t,LV.x,'r-',label='fish', linewidth=2)
 pylab.plot(LV.t,LV.y,'c-',label='shark', linewidth=2)
 pylab.plot(PP.t,PP.n_fish,'ro',label='fish')
 pylab.plot(PP.t,PP.n_shark,'co',label='shark')
+pylab.xlim([500,2000])
 pylab.legend(loc=0,numpoints=1)
 pylab.xlabel('time')
 pylab.ylabel('number')
