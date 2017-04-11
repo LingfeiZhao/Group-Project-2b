@@ -1,6 +1,7 @@
 import random
 import pylab
 import matplotlib.animation as animation
+import copy
 
 class Predator_Prey(object):
 
@@ -131,9 +132,7 @@ class Predator_Prey(object):
 
 class Lotka_Volterra(object):
 
-    def __init__(self, x0, y0, xmin, xmax, ymin, ymax, c, t_end=1000, dt=0.1):
-        self.x0=x0
-        self.y0=y0
+    def __init__(self, x0, y0, t0, xmin, xmax, ymin, ymax, c, t_end=1000, dt=0.1):
         self.alpha=c*self.g(self.h(xmax/float(xmin)))
         self.beta=c*self.g(self.h(xmax/float(xmin)))*self.h(ymax/float(ymin))/float(ymin)
         self.gamma=c*self.g(self.h(ymax/float(ymin)))
@@ -141,9 +140,9 @@ class Lotka_Volterra(object):
         self.t_end=t_end
         self.dt=dt
 
-        self.x=[self.x0]
-        self.y=[self.y0]
-        self.t=[0]
+        self.x=[x0]
+        self.y=[y0]
+        self.t=[t0]
 
     def h(self, x):
         return pylab.log(x)/(x-1)
@@ -178,21 +177,21 @@ class Lotka_Volterra(object):
             self.t.append(tn)
 
 # solve the Lotka Volterra model
-LV=Lotka_Volterra(x0=300, y0=20, xmin=100, xmax=1500, ymin=20, ymax=200, c=0.06)
+LV=Lotka_Volterra(x0=4000, y0=200, t0=0, xmin=1000, xmax=8000, ymin=200, ymax=1000, c=0.1)
 LV.solve()
 
 # simulate the shark and fish
-PP=Predator_Prey(n0_shark=20, n0_fish=300, breed_age_shark=20, breed_age_fish=10, starve_time_shark=10,gridlen=40)
+PP=Predator_Prey(n0_shark=200, n0_fish=4000, breed_age_shark=20, breed_age_fish=10, starve_time_shark=10, gridlen=100)
 Grids=[]
 for i in range(1000):
     PP.update()
-    Grids.append(PP.grid)
+    Grids.append(copy.deepcopy(PP.grid))
     
 # plot population vs time
-pylab.plot(LV.t,LV.x,'c-',label='fish', linewidth=2)
-pylab.plot(LV.t,LV.y,'r-',label='shark', linewidth=2)
-pylab.plot(PP.t,PP.n_fish,'co',label='fish')
-pylab.plot(PP.t,PP.n_shark,'ro',label='shark')
+pylab.plot(LV.t,LV.x,'r-',label='fish', linewidth=2)
+pylab.plot(LV.t,LV.y,'c-',label='shark', linewidth=2)
+pylab.plot(PP.t,PP.n_fish,'ro',label='fish')
+pylab.plot(PP.t,PP.n_shark,'co',label='shark')
 pylab.legend(loc=0,numpoints=1)
 pylab.xlabel('time')
 pylab.ylabel('number')

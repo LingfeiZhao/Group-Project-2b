@@ -6,7 +6,7 @@ from matplotlib import animation
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.figure import Figure
 import numpy
-from PIL import Image
+#from PIL import Image
  
 
 
