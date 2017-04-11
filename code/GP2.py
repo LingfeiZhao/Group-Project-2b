@@ -129,7 +129,46 @@ class Predator_Prey(object):
         self.n_shark.append(sum(i.count(-1) for i in self.grid))
         self.n_fish.append(sum(i.count(1) for i in self.grid))
 
+class Lotka_Volterra(object):
+    def __init__(self, x0, y0, alpha, beta, gamma, delta, t_end=1000, dt=0.1):
+        self.x0=x0
+        self.y0=y0
+        self.alpha=alpha
+        self.beta=beta
+        self.gamma=gamma
+        self.delta=delta
+        self.t_end=t_end
+        self.dt=dt
 
+        self.x=[self.x0]
+        self.y=[self.y0]
+        self.t=[0]
+    def Dx(self, x, y, t):
+        return x*(self.alpha-self.beta*y)
+    def Dy(self, x, y, t):
+        return -y*(self.gamma-self.delta*x)
+    def runge_kutta(self, x, y, t): #runge_kutta method
+        #calculate the slopes
+        k1=self.Dy(x,y,t)
+        l1=self.Dx(x,y,t)
+        k2=self.Dy(x+l1*self.dt/2.0,y+k1*self.dt/2.0,t+self.dt/2.0)
+        l2=self.Dx(x+l1*self.dt/2.0,y+k1*self.dt/2.0,t+self.dt/2.0)
+        k3=self.Dy(x+l2*self.dt/2.0,y+k2*self.dt/2.0,t+self.dt/2.0)
+        l3=self.Dx(x+l2*self.dt/2.0,y+k2*self.dt/2.0,t+self.dt/2.0)
+        k4=self.Dy(x+l3*self.dt,y+k3*self.dt,t+self.dt)
+        l4=self.Dx(x+l3*self.dt,y+k3*self.dt,t+self.dt)
+        #calculate the new values
+        yn=y+(k1+2*k2+2*k3+k4)/6.0*self.dt
+        xn=x+(l1+2*l2+2*l3+l4)/6.0*self.dt
+        tn=t+self.dt
+        return xn,yn,tn
+    def solve(self):
+        while self.t[-1]<self.t_end:
+            xn,yn,tn=self.runge_kutta(self.x[-1],self.y[-1],self.t[-1])
+            self.x.append(xn)
+            self.y.append(yn)
+            self.t.append(tn)
+"""
 PP=Predator_Prey(n0_shark=20, n0_fish=300, breed_age_shark=20, breed_age_fish=10, starve_time_shark=10,gridlen=40)
 
 fig=pylab.figure()
@@ -154,5 +193,17 @@ pylab.ylabel('number')
 pylab.savefig('population.pdf')
 pylab.show()
 
+"""
+LV=Lotka_Volterra(x0=300, y0=20, alpha=1.0/10, beta=0.001, gamma=1.0/10, delta=0.1/20)
+LV.solve()
 
+pylab.plot(LV.t,LV.x,'c-',label='fish')
+pylab.plot(LV.t,LV.y,'k-',label='shark')
+pylab.legend(loc=0,numpoints=1)
+pylab.xlabel('time')
+pylab.ylabel('number')
+pylab.xlim([0,1000])
+pylab.ylim([0,1600])
+#pylab.savefig('population.pdf')
+pylab.show()
 
