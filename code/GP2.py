@@ -67,7 +67,6 @@ class Predator_Prey(object):
                 self.fishes[pos_new]=self.fishes.pop(pos)+1
             return
         #this fish has no place to go
-        #print pos
         self.fishes[pos]+=1
 
 
@@ -75,7 +74,6 @@ class Predator_Prey(object):
     def shark_update(self, pos):
         fish, spare=self.neighbor(pos)
         if fish: # if there is fish neighbor, the shark hunts
-#            print "eat fish"
             pos_new=random.choice(fish)
             # eat the fish, reset hungry_time, add age
             self.grid[pos_new[0]][pos_new[1]]=-1
@@ -91,7 +89,6 @@ class Predator_Prey(object):
             return
 
         elif spare: # if there is spare neighbor
-#            print "shark swim"
             pos_new=random.choice(spare)
             # add hungry_time, add age
             self.sharks[pos]=(self.sharks[pos][0]+1,self.sharks[pos][1]+1)
@@ -109,7 +106,6 @@ class Predator_Prey(object):
                 self.grid[pos[0]][pos[1]]=0
                 self.sharks[pos_new]=self.sharks.pop(pos)
             return
-        #print "stay"
         #it has no place to go now.
         self.sharks[pos]=(self.sharks[pos][0]+1,self.sharks[pos][1]+1)
         if self.sharks[pos][1]==self.starve_time_shark: # starve 
